@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const productos = [
-        { id: 1, nombre: "Proteína en Polvo", precio: 25000, imagen: "images/protein-art.png" },
-        { id: 2, nombre: "Bandas de Resistencia", precio: 15000, imagen: "images/banda_resistencia.png" },
+        { id: 1, nombre: "Proteína en Polvo", precio: 25000, imagen: "images/protein-art.jpg" },
+        { id: 2, nombre: "Bandas de Resistencia", precio: 15000, imagen: "images/banda_resistencia.jpg" },
         { id: 3, nombre: "Mancuernas Ajustables", precio: 50000, imagen: "images/Mancuernas_ajustables.jpg" },
-        { id: 4, nombre: "Ropa Deportiva", precio: 30000, imagen: "images/ropa_deportiva.png" }
+        { id: 4, nombre: "Ropa Deportiva", precio: 30000, imagen: "images/ropa_deportiva.jpg" }
     ];
 
     const blogPosts = [
