@@ -280,3 +280,22 @@ footer {
     background-color: #000;
     color: #fff;
 }
+
+.logo {
+    height: auto;
+    width: 120px;
+    display: block;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+nav h1 {
+    display: none;
+}
