@@ -21,35 +21,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginLinkItem = document.getElementById('login-link-item');
     const registerLinkItem = document.getElementById('register-link-item');
     
+    // Se utiliza el estado de autenticación y el correo actual
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const currentUserEmail = localStorage.getItem('currentUserEmail');
 
-    const isPageInSubfolder = window.location.pathname.includes('pages/');
+    // Determinación simplificada de la ruta base
+    const isPageInSubfolder = window.location.pathname.includes('/pages/');
     const basePath = isPageInSubfolder ? '../' : '';
 
     function handleUserState() {
         if (!navLinksContainer) return;
 
-        if (currentUserEmail) {
+        // Limpiar enlaces de perfil/logout existentes para evitar duplicados
+        document.getElementById('profile-link-item')?.remove();
+        document.getElementById('logout-link-item')?.remove();
+
+        if (isAuthenticated) {
+            // Usuario autenticado
             if (loginLinkItem) loginLinkItem.style.display = 'none';
             if (registerLinkItem) registerLinkItem.style.display = 'none';
 
             const profileLink = document.createElement('li');
-            profileLink.innerHTML = `<a href="#">Mi Perfil</a>`;
+            profileLink.innerHTML = `<a href="#">Hola, ${currentUserEmail || 'Usuario'}</a>`;
             profileLink.id = 'profile-link-item';
             
             const logoutLink = document.createElement('li');
             logoutLink.innerHTML = `<a href="#" id="logout-link">Cerrar Sesión</a>`;
             logoutLink.id = 'logout-link-item';
             
-            if (!document.getElementById('profile-link-item')) {
-                 navLinksContainer.appendChild(profileLink);
-                 navLinksContainer.appendChild(logoutLink);
-            }
-
+            navLinksContainer.appendChild(profileLink);
+            navLinksContainer.appendChild(logoutLink);
+            
+            // Mostrar botón de compra solo si está autenticado
             if (confirmarCompraBtn) {
-                confirmarCompraBtn.style.display = 'block';
+                confirmarCompraBtn.style.display = 'inline-block';
             }
         } else {
+            // Usuario no autenticado
             if (loginLinkItem) loginLinkItem.style.display = 'list-item';
             if (registerLinkItem) registerLinkItem.style.display = 'list-item';
 
@@ -62,8 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         if (e.target && e.target.id === 'logout-link') {
             e.preventDefault();
+            // Limpiar estado de autenticación y carrito
+            localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('currentUserEmail');
             localStorage.removeItem('carrito');
+            // Redirigir a la página principal
             window.location.href = basePath + 'INDEX.html'; 
         }
 
@@ -81,13 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (productList) {
             productList.innerHTML = '';
             productos.forEach(producto => {
-                const imgPath = isPageInSubfolder ? basePath + producto.imagen : producto.imagen;
+                // Ajuste de ruta de imagen: las imágenes están en '../images' si se llama desde 'pages/'
+                const imgPath = isPageInSubfolder ? basePath + 'images/' + producto.imagen.split('/').pop() : producto.imagen;
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
                 productCard.innerHTML = `
                     <img src="${imgPath}" alt="Imagen del producto ${producto.nombre}" onerror="this.onerror=null;this.src='https://placehold.co/250x250/000000/FFFFFF?text=Imagen+no+encontrada';"/>
                     <h3>${producto.nombre}</h3>
-                    <p><strong>$${producto.precio.toLocaleString()}</strong></p>
+                    <p><strong>$${producto.precio.toLocaleString('es-CL')}</strong></p>
                     <button class="add-to-cart-btn btn" data-id="${producto.id}">Añadir al carrito</button>
                 `;
                 productList.appendChild(productCard);
@@ -107,14 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let total = 0;
                 carrito.forEach(item => {
                     total += item.precio * item.cantidad;
-                    const imgPath = isPageInSubfolder ? basePath + item.imagen : item.imagen;
+                    // Ajuste de ruta de imagen para el carrito
+                    const imgPath = isPageInSubfolder ? basePath + 'images/' + item.imagen.split('/').pop() : item.imagen;
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'carrito-item';
                     itemDiv.innerHTML = `
                         <img src="${imgPath}" alt="${item.nombre}" />
                         <div class="item-details">
                             <h4>${item.nombre}</h4>
-                            <p>Precio: $${item.precio.toLocaleString()}</p>
+                            <p>Precio: $${item.precio.toLocaleString('es-CL')}</p>
                             <p>Cantidad: ${item.cantidad}</p>
                         </div>
                         <div class="item-actions">
@@ -124,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     carritoContainer.appendChild(itemDiv);
                 });
                 if (totalCarritoSpan) {
-                     totalCarritoSpan.textContent = `$${total.toLocaleString()}`;
+                     totalCarritoSpan.textContent = `$${total.toLocaleString('es-CL')}`;
                 }
             }
         }
@@ -140,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 carrito.push({ ...producto, cantidad: 1 });
             }
             guardarCarrito();
-            showCustomAlert(`${producto.nombre} ha sido añadido al carrito.`);
+            showCustomAlert(`"${producto.nombre}" ha sido añadido al carrito.`);
         }
     }
 
@@ -164,14 +177,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function confirmarCompra() {
+        if (!isAuthenticated) {
+            confirmacionCompraMsg.textContent = 'Debes iniciar sesión para confirmar la compra.';
+            confirmacionCompraMsg.style.color = '#e53935';
+            return;
+        }
+        
         if (carrito.length === 0) {
             confirmacionCompraMsg.textContent = 'El carrito está vacío. Añade productos para comprar.';
             confirmacionCompraMsg.style.color = '#e53935';
         } else {
+            // Simulación de una compra real (esto debería ser manejado en un backend)
             carrito = [];
             guardarCarrito();
             confirmacionCompraMsg.textContent = '¡Compra confirmada con éxito! Revisa tu correo para más detalles.';
             confirmacionCompraMsg.style.color = '#4CAF50';
+            // Opcionalmente, redirigir después de la confirmación:
+            // setTimeout(() => { window.location.href = basePath + 'INDEX.html'; }, 3000);
         }
     }
 
@@ -223,12 +245,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 valid = false;
             }
 
-            const emailRegex = /^[a-zA-Z0-9._-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/;
+            // Validación de email ahora acepta cualquier formato válido (eliminada la restricción de dominio)
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
             if (email === '') {
                 errorEmail.textContent = 'El correo electrónico es requerido.';
                 valid = false;
             } else if (!emailRegex.test(email)) {
-                errorEmail.textContent = 'Formato de correo inválido. Solo se aceptan @duoc.cl, @profesor.duoc.cl, @gmail.com.';
+                errorEmail.textContent = 'Formato de correo electrónico inválido.';
                 valid = false;
             } else if (email.length > 100) {
                 errorEmail.textContent = 'El correo electrónico no puede exceder los 100 caracteres.';
@@ -257,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmarCompraBtn.addEventListener('click', confirmarCompra);
     }
     
+    // Inicializar el estado y el carrito
     handleUserState();
     renderizarProductos();
     renderizarCarrito();
