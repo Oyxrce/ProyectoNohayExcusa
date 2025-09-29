@@ -23,11 +23,10 @@ nav {
     margin: 0 auto;
 }
 
-nav h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #e53935;
-    margin: 0;
+.logo {
+    height: auto;
+    width: 120px;
+    display: block;
 }
 
 nav ul {
@@ -66,10 +65,32 @@ section h2 {
     padding: 6rem 2rem;
     background-color: #222;
     color: #fff;
+    background-image: url('../images/hero_banner.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.hero h2, .hero p {
+    color: #fff;
+    position: relative;
+    z-index: 2;
 }
 
 .hero h2 {
-    color: #fff;
     font-size: 3rem;
     margin-bottom: 1rem;
 }
@@ -117,14 +138,6 @@ section h2 {
     object-fit: cover;
     border-radius: 8px;
     border: 2px solid #555;
-}
-
-.product-card h3 {
-    margin: 1rem 0 0.5rem;
-}
-
-.product-card p {
-    margin: 0 0 1rem;
 }
 
 .add-to-cart-btn {
@@ -279,23 +292,4 @@ footer {
     padding: 1.5rem;
     background-color: #000;
     color: #fff;
-}
-
-.logo {
-    height: auto;
-    width: 120px;
-    display: block;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-nav h1 {
-    display: none;
 }

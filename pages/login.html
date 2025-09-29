@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - NOHAYEXCUSA.CL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div>
+                <a href="../INDEX.html"><img src="../images/logo.jpg" alt="Logo de NOHAYEXCUSA.CL" class="logo"></a>
+            </div>
+            <ul id="main-nav-links">
+                <li><a href="../INDEX.html">Inicio</a></li>
+                <li><a href="nosotros.html">Quiénes somos</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
+                <li id="login-link-item"><a href="login.html">Login</a></li>
+                <li id="register-link-item"><a href="register.html">Registro</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Iniciar sesión</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" name="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" name="login-password" required>
+                </div>
+                <!-- Simulación del botón de alto contraste, usando la clase .btn existente -->
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px; font-size: 1.1rem;">Iniciar sesión</button>
+            </form>
+            <div id="auth-msg" class="login-msg" style="margin-top: 20px;"></div>
+            
+            <!-- Estilo para imitar el "Eres un usuario nuevo? Crear cuenta" -->
+            <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0 15px;">
+            <p style="text-align: center; color: #ccc;">
+                ¿Eres un usuario nuevo? <a href="register.html" style="color: #e53935; text-decoration: none; font-weight: 700;">Crear cuenta</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 NOHAYEXCUSA.CL - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - NOHAYEXCUSA.CL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div>
+                <a href="../INDEX.html"><img src="../images/logo.jpg" alt="Logo de NOHAYEXCUSA.CL" class="logo"></a>
+            </div>
+            <ul id="main-nav-links">
+                <li><a href="../INDEX.html">Inicio</a></li>
+                <li><a href="nosotros.html">Quiénes somos</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="carrito.html"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
+                <li id="login-link-item"><a href="login.html">Login</a></li>
+                <li id="register-link-item"><a href="register.html">Registro</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Registro de Usuario</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="register-email">E-mail</label>
+                    <input type="email" id="register-email" name="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" name="register-password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px; font-size: 1.1rem;">Registrarse</button>
+            </form>
+            <div id="auth-msg" class="login-msg" style="margin-top: 20px;"></div>
+            
+            <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0 15px;">
+            <p style="text-align: center; color: #ccc;">
+                ¿Ya tienes cuenta? <a href="login.html" style="color: #e53935; text-decoration: none; font-weight: 700;">Iniciar sesión</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 NOHAYEXCUSA.CL - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/login.js"></script>
+</body>
+</html>

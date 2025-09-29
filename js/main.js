@@ -7,31 +7,85 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 4, nombre: "Ropa Deportiva", precio: 30000, imagen: "images/ropa_deportiva.jpg" }
     ];
 
-    const blogPosts = [
-        { id: 1, titulo: "Caso Curioso #1", descripcion: "Nuestro objetivo es que logres resultados reales, sin excusas. ¡Conoce a Juanito Pérez que bajó 10 kg en un mes!", imagen: "images/blog-1.png" },
-        { id: 2, titulo: "Caso Curioso #2", descripcion: "Entrena con los mejores consejos y trucos para tonificar y quemar calorías. Descubre los 5 mejores ejercicios.", imagen: "images/blog-2.png" }
-    ];
-
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
     const productList = document.getElementById('product-list');
-    const blogPostsContainer = document.getElementById('blog-posts-container');
     const carritoContainer = document.getElementById('carrito-container');
     const totalCarritoSpan = document.getElementById('total-carrito');
     const cartCountSpan = document.getElementById('cart-count');
     const contactForm = document.getElementById('contactForm');
-    const contactSuccessMsg = document.getElementById('contact-success-msg');
     const confirmarCompraBtn = document.getElementById('confirmar-compra-btn');
     const confirmacionCompraMsg = document.getElementById('confirmacion-compra-msg');
+
+    const navLinksContainer = document.getElementById('main-nav-links');
+    const loginLinkItem = document.getElementById('login-link-item');
+    const registerLinkItem = document.getElementById('register-link-item');
+    
+    const currentUserEmail = localStorage.getItem('currentUserEmail');
+
+    const isPageInSubfolder = window.location.pathname.includes('pages/');
+    const basePath = isPageInSubfolder ? '../' : '';
+
+    function handleUserState() {
+        if (!navLinksContainer) return;
+
+        if (currentUserEmail) {
+            if (loginLinkItem) loginLinkItem.style.display = 'none';
+            if (registerLinkItem) registerLinkItem.style.display = 'none';
+
+            const profileLink = document.createElement('li');
+            profileLink.innerHTML = `<a href="#">Mi Perfil</a>`;
+            profileLink.id = 'profile-link-item';
+            
+            const logoutLink = document.createElement('li');
+            logoutLink.innerHTML = `<a href="#" id="logout-link">Cerrar Sesión</a>`;
+            logoutLink.id = 'logout-link-item';
+            
+            if (!document.getElementById('profile-link-item')) {
+                 navLinksContainer.appendChild(profileLink);
+                 navLinksContainer.appendChild(logoutLink);
+            }
+
+            if (confirmarCompraBtn) {
+                confirmarCompraBtn.style.display = 'block';
+            }
+        } else {
+            if (loginLinkItem) loginLinkItem.style.display = 'list-item';
+            if (registerLinkItem) registerLinkItem.style.display = 'list-item';
+
+            if (confirmarCompraBtn) {
+                confirmarCompraBtn.style.display = 'none';
+            }
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'logout-link') {
+            e.preventDefault();
+            localStorage.removeItem('currentUserEmail');
+            localStorage.removeItem('carrito');
+            window.location.href = basePath + 'INDEX.html'; 
+        }
+
+        if (e.target.classList.contains('add-to-cart-btn')) {
+            const productId = parseInt(e.target.dataset.id);
+            agregarAlCarrito(productId);
+        }
+        if (e.target.classList.contains('remove-from-cart-btn')) {
+            const productId = parseInt(e.target.dataset.id);
+            eliminarDelCarrito(productId);
+        }
+    });
 
     function renderizarProductos() {
         if (productList) {
             productList.innerHTML = '';
             productos.forEach(producto => {
+                const imgPath = isPageInSubfolder ? basePath + producto.imagen : producto.imagen;
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
                 productCard.innerHTML = `
-                    <img src="${producto.imagen}" alt="Imagen del producto ${producto.nombre}" onerror="this.onerror=null;this.src='https://placehold.co/1080x1080/000000/FFFFFF?text=Imagen+no+encontrada';"/>
+                    <img src="${imgPath}" alt="Imagen del producto ${producto.nombre}" onerror="this.onerror=null;this.src='https://placehold.co/250x250/000000/FFFFFF?text=Imagen+no+encontrada';"/>
                     <h3>${producto.nombre}</h3>
                     <p><strong>$${producto.precio.toLocaleString()}</strong></p>
                     <button class="add-to-cart-btn btn" data-id="${producto.id}">Añadir al carrito</button>
@@ -41,19 +95,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderizarBlog() {
-        if (blogPostsContainer) {
-            blogPostsContainer.innerHTML = '';
-            blogPosts.forEach(post => {
-                const blogPostCard = document.createElement('div');
-                blogPostCard.className = 'blog-post-card';
-                blogPostCard.innerHTML = `
-                    <img src="${post.imagen}" alt="Imagen del blog post ${post.titulo}" onerror="this.onerror=null;this.src='https://placehold.co/1080x1080/000000/FFFFFF?text=Imagen+no+encontrada';"/>
-                    <h3>${post.titulo}</h3>
-                    <p>${post.descripcion}</p>
-                `;
-                blogPostsContainer.appendChild(blogPostCard);
-            });
+    function renderizarCarrito() {
+        if (carritoContainer) {
+            carritoContainer.innerHTML = '';
+            if (carrito.length === 0) {
+                carritoContainer.innerHTML = '<p>El carrito de compras está vacío.</p>';
+                if (totalCarritoSpan) {
+                    totalCarritoSpan.textContent = `$0`;
+                }
+            } else {
+                let total = 0;
+                carrito.forEach(item => {
+                    total += item.precio * item.cantidad;
+                    const imgPath = isPageInSubfolder ? basePath + item.imagen : item.imagen;
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'carrito-item';
+                    itemDiv.innerHTML = `
+                        <img src="${imgPath}" alt="${item.nombre}" />
+                        <div class="item-details">
+                            <h4>${item.nombre}</h4>
+                            <p>Precio: $${item.precio.toLocaleString()}</p>
+                            <p>Cantidad: ${item.cantidad}</p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="remove-from-cart-btn" data-id="${item.id}">Eliminar</button>
+                        </div>
+                    `;
+                    carritoContainer.appendChild(itemDiv);
+                });
+                if (totalCarritoSpan) {
+                     totalCarritoSpan.textContent = `$${total.toLocaleString()}`;
+                }
+            }
         }
     }
     
@@ -90,38 +163,34 @@ document.addEventListener('DOMContentLoaded', () => {
         showCustomAlert('Producto eliminado del carrito.');
     }
 
-    function renderizarCarrito() {
-        if (carritoContainer) {
-            carritoContainer.innerHTML = '';
-            if (carrito.length === 0) {
-                carritoContainer.innerHTML = '<p>El carrito de compras está vacío.</p>';
-                if (totalCarritoSpan) {
-                    totalCarritoSpan.textContent = `$0`;
-                }
-            } else {
-                let total = 0;
-                carrito.forEach(item => {
-                    total += item.precio * item.cantidad;
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'carrito-item';
-                    itemDiv.innerHTML = `
-                        <img src="${item.imagen}" alt="${item.nombre}" />
-                        <div class="item-details">
-                            <h4>${item.nombre}</h4>
-                            <p>Precio: $${item.precio.toLocaleString()}</p>
-                            <p>Cantidad: ${item.cantidad}</p>
-                        </div>
-                        <div class="item-actions">
-                            <button class="remove-from-cart-btn" data-id="${item.id}">Eliminar</button>
-                        </div>
-                    `;
-                    carritoContainer.appendChild(itemDiv);
-                });
-                if (totalCarritoSpan) {
-                     totalCarritoSpan.textContent = `$${total.toLocaleString()}`;
-                }
-            }
+    function confirmarCompra() {
+        if (carrito.length === 0) {
+            confirmacionCompraMsg.textContent = 'El carrito está vacío. Añade productos para comprar.';
+            confirmacionCompraMsg.style.color = '#e53935';
+        } else {
+            carrito = [];
+            guardarCarrito();
+            confirmacionCompraMsg.textContent = '¡Compra confirmada con éxito! Revisa tu correo para más detalles.';
+            confirmacionCompraMsg.style.color = '#4CAF50';
         }
+    }
+
+    function showCustomAlert(message) {
+        const msgBox = document.createElement('div');
+        msgBox.textContent = message;
+        msgBox.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #333; color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 10000; opacity: 0; transition: opacity 0.5s ease;`;
+        document.body.appendChild(msgBox);
+
+        setTimeout(() => {
+            msgBox.style.opacity = '1';
+        }, 10);
+
+        setTimeout(() => {
+            msgBox.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(msgBox);
+            }, 500);
+        }, 2000);
     }
 
     if (contactForm) {
@@ -175,75 +244,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (valid) {
-                contactSuccessMsg.textContent = '¡Mensaje enviado con éxito!';
-                contactSuccessMsg.style.color = '#4CAF50';
+                document.getElementById('contact-success-msg').textContent = '¡Mensaje enviado con éxito!';
+                document.getElementById('contact-success-msg').style.color = '#4CAF50';
                 contactForm.reset();
             } else {
-                 contactSuccessMsg.textContent = '';
+                 document.getElementById('contact-success-msg').textContent = '';
             }
         });
     }
 
-    function confirmarCompra() {
-        if (carrito.length === 0) {
-            confirmacionCompraMsg.textContent = 'El carrito está vacío. Añade productos para comprar.';
-            confirmacionCompraMsg.style.color = '#e53935';
-        } else {
-            carrito = [];
-            guardarCarrito();
-            confirmacionCompraMsg.textContent = '¡Compra confirmada con éxito! Revisa tu correo para más detalles.';
-            confirmacionCompraMsg.style.color = '#4CAF50';
-        }
-    }
-
-    function showCustomAlert(message) {
-        const msgBox = document.createElement('div');
-        msgBox.textContent = message;
-        msgBox.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 10000;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        `;
-        document.body.appendChild(msgBox);
-
-        setTimeout(() => {
-            msgBox.style.opacity = '1';
-        }, 10);
-
-        setTimeout(() => {
-            msgBox.style.opacity = '0';
-            setTimeout(() => {
-                document.body.removeChild(msgBox);
-            }, 500);
-        }, 2000);
-    }
-    
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-to-cart-btn')) {
-            const productId = parseInt(e.target.dataset.id);
-            agregarAlCarrito(productId);
-        }
-        if (e.target.classList.contains('remove-from-cart-btn')) {
-            const productId = parseInt(e.target.dataset.id);
-            eliminarDelCarrito(productId);
-        }
-    });
-
     if (confirmarCompraBtn) {
         confirmarCompraBtn.addEventListener('click', confirmarCompra);
     }
-
+    
+    handleUserState();
     renderizarProductos();
-    renderizarBlog();
-    actualizarContadorCarrito();
     renderizarCarrito();
+    actualizarContadorCarrito();
 });
